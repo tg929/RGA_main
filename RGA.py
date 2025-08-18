@@ -720,17 +720,17 @@ def smiles_to_sdfs(vars, gen_smiles_file, smile_file_directory):
     gypsum_timeout_limit = vars["gypsum_timeout_limit"]
 
     # Make a new folder to put gypsum .smi's and json. Name folder gypsum_submission_files.
-    folder_path = "{}gypsum_submission_files{}".format(smile_file_directory, os.sep)
+    folder_path = os.path.join(smile_file_directory, "gypsum_submission_files")
     if os.path.exists(folder_path) is False:
         os.makedirs(folder_path)
 
     # Make Output for Gypsum folder (where .sdf's go)
-    gypsum_output_folder_path = "{}3D_SDFs{}".format(smile_file_directory, os.sep)
+    gypsum_output_folder_path = os.path.join(smile_file_directory, "3D_SDFs")
     if os.path.exists(gypsum_output_folder_path) is False:
         os.makedirs(gypsum_output_folder_path)
 
     # Make a folder to put the log files into within the 3D_SDFs folder
-    gypsum_log_path = "{}log{}".format(gypsum_output_folder_path, os.sep)
+    gypsum_log_path = os.path.join(gypsum_output_folder_path, "log")
     if os.path.exists(gypsum_log_path) is False:
         os.makedirs(gypsum_log_path)
 
@@ -768,6 +768,10 @@ def pdb_to_pdbqt(vars, pdb_dir):
     conversion_choice = vars["conversion_choice"]
     receptor = vars["filename_of_receptor"]
 
+    # Ensure directory ends with os.sep so glob patterns in find_* work
+    if pdb_dir[-1:] != os.sep:
+        pdb_dir = pdb_dir + os.sep
+
     # Use a temp vars dict so you don't put mpi multiprocess info through itself...
     temp_vars = {}
     for key in list(vars.keys()):
@@ -804,6 +808,8 @@ import autogrow.docking.ranking.ranking_mol as Ranking
 
 
 def docking_pdbqt(vars, docking_object, pdbqt_folder, full_smiles_file):
+    if pdbqt_folder[-1:] != os.sep:
+        pdbqt_folder = pdbqt_folder + os.sep
     pdbqts_in_folder = docking_object.find_converted_ligands(pdbqt_folder)
     job_input_dock_lig = tuple([tuple([docking_object, pdbqt]) for pdbqt in pdbqts_in_folder])
     smiles_names_failed_to_dock = vars["parallelizer"].run(job_input_dock_lig, run_dock_multithread)  
