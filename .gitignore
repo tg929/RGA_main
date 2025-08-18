@@ -1,0 +1,12 @@
+results_*/*
+result_*
+*.txt
+output_*/*
+autogrow/*
+vars.json
+pdb/*
+source_*/*
+*.png
+*.ckpt
+4r6e*
+*.pyc
