@@ -1108,7 +1108,16 @@ for num_gen in tqdm(range(args_dict['num_generations'])):
                 id2smiles[smiles_id] = smiles 
         print('new_smiles_list', len(new_smiles_list))
         print("---------- 6. docking ----------")
-        smiles_list = docking(smiles_folder = results_folder, smiles_file = smiles_file, args_dict = vars) #### receptor is in "vars"  
+        # 如果本代没有产生新的分子，则跳过 docking，避免 Gypsum 无 SDF 报错
+        if len(new_smiles_list) == 0:
+            print("There are no new SMILES in this generation. Skipping docking for this receptor.")
+            continue
+        try:
+            smiles_list = docking(smiles_folder = results_folder, smiles_file = smiles_file, args_dict = vars) #### receptor is in "vars"  
+        except Exception as e:
+            print(str(e))
+            print("Docking failed for this generation (likely Gypsum produced no SDF). Skipping to next receptor.")
+            continue
         # ["[N-]=[NH+]/N=C/c1[nH+]nc(-c2cccc3ccccc23)o1", "naphthalene_35", "naphthalene_35", "naphthalene_35__3", '-9.2', 40.14 (diversity), ['results_xxxx/xxxx__1.pdbqt', 'results_xxxx/xxxxx__2.pdbqt']]
         for info in smiles_list:
             smiles, smiles_id, binding_score, pdbqtvina_list = info[0], info[1], float(info[-3]), info[-1]
