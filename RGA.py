@@ -1189,6 +1189,12 @@ for num_gen in tqdm(range(args_dict['num_generations'])):
         # print(smiles2info[name_of_receptor])
         results = [[k,v[0],v[1],v[2]] for k,v in smiles2info[name_of_receptor].items() if k!='smiles_info_list']
         results.sort(key=lambda x:x[2])
+        # Save per-generation snapshot
+        per_gen_filename = 'results_gen' + str(num_gen + 1) + '_' + name_of_receptor + '.txt'
+        with open(per_gen_filename, 'w') as fo:
+            for result in results:
+                fo.write('\t'.join([str(i) for i in result]) + '\n')
+        # Also maintain rolling latest file for backward compatibility
         with open('result_'+name_of_receptor + '.txt', 'w') as fo:
             for result in results:
                 fo.write('\t'.join([str(i) for i in result]) + '\n')
